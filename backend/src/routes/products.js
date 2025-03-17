@@ -1,18 +1,13 @@
-/*
-Este archivo sirve para definir
-que metodos del CRUD va a tener mi ruta
-(/api/products)
-*/
-
 import express from "express";
 import productsController from "../controllers/productsController.js";
-
+// Router() nos ayuda a colocar los metodos
+// que tendra mi ruta
 const router = express.Router();
 
 router
   .route("/")
   .get(productsController.getProducts)
-  .post(productsController.insertProducts);
+  .post(productsController.createProducts);
 
 router
   .route("/:id")
