@@ -1,6 +1,6 @@
 import EmployeeModel from "../models/employee.js";
-import bcryptjs from "bcryptjs";
-import jsonwebtoken from "jsonwebtoken";
+import bcryptjs from "bcryptjs"; //para encriptar
+import jsonwebtoken from "jsonwebtoken"; //para generar token
 import { config } from "../config.js";
 
 const registerEmployeesController = {};
