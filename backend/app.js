@@ -5,12 +5,16 @@ import customersRoutes from "./src/routes/customers.js";
 import employeeRoutes from "./src/routes/employees.js";
 import branchesRoutes from "./src/routes/branches.js";
 import reviewRoutes from "./src/routes/reviews.js";
+import registerEmployesRoutes from "./src/routes/registerEmployees.js";
+import cookieParser from "cookie-parser";
 
 // Creo una constante que es igual a la libreria que importé
 const app = express();
 
 //Que acepte datos en json
 app.use(express.json());
+//Que acepte cookies en postman
+app.use(cookieParser());
 
 // Definir las rutas de las funciones que tendrá la página web
 app.use("/api/products", productsRoutes);
@@ -18,8 +22,7 @@ app.use("/api/customers", customersRoutes);
 app.use("/api/employee", employeeRoutes);
 app.use("/api/branches", branchesRoutes);
 app.use("/api/reviews", reviewRoutes);
-
-// 
+app.use("/api/registerEmployees", registerEmployesRoutes);
 
 // Exporto la constante para poder usar express en otros archivos
 export default app;
