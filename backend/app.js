@@ -27,7 +27,9 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/registerEmployees", registerEmployesRoutes);
 app.use("/api/login", loginRoute);
 app.use("/api/logout", logoutRoute);
+
 app.use("/api/registerClients", registerClient);
+
 
 // Exporto la constante para poder usar express en otros archivos
 export default app;

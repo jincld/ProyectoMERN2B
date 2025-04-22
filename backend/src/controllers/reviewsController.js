@@ -3,7 +3,7 @@ import reviewModel from "../models/Reviews.js";
 
 // SELECT
 reviewController.getReviews = async (req, res) => {
-  const reviews = await reviewModel.find().populate("idClient");
+  const reviews = await reviewModel.find().populate("idClient").populate("idProduct");
   res.json(reviews);
 };
 
