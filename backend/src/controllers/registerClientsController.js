@@ -61,13 +61,6 @@ registerClientsController.register = async (req, res) => {
 
     res.cookie("verificationToken", tokenCode, { maxAge: 2 * 60 * 60 * 1000 });
 
-
-
-
-
-
-
-    
     // Enviar el correo electronico
     //1- Transporter => quien lo envia
     const transporter = nodemailer.createTransport({

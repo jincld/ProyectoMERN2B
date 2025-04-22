@@ -4,4 +4,4 @@ import logoutController from "../controllers/logoutController.js";
 
 router.route("/").post(logoutController.logout);
 3
-export default router;
+export default router;z
