@@ -47,17 +47,16 @@ passwordRecoveryController.requestCode = async (req, res) => {
       { expiresIn: "20m" }
     );
 
-    res.cookie("tokenRecoveryCode", token, {maxAge: 20 * 60 * 1000})
+    res.cookie("tokenRecoveryCode", token, { maxAge: 20 * 60 * 1000 });
 
     // ULTIMO PASO, enviar el correo
     await sendMail(
-        email,
-        "Password recovery code", //Asunto
-        `Your verification code is: ${code}`, //Texto
-        HTMLRecoveryEmail(code) //
-    )
+      email,
+      "Password recovery code", //Asunto
+      `Your verification code is: ${code}`, //Texto
+      HTMLRecoveryEmail(code) //
+    );
 
-    res.json({message: "Verification code se"})
-
+    res.json({ message: "Verification code send" });
   } catch (error) {}
 };
