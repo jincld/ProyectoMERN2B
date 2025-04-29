@@ -41,19 +41,19 @@ const employeeSchema = new Schema(
     },
 
     telephone: {
-      type: Number,
+      type: String,
       require: true,
     },
 
     dui: {
-      type: Number,
+      type: String,
       require: true,
     },
     isVerified: {
       type: Boolean,
     },
     issnumber: {
-      type: Number,
+      type: String,
       require: true,
     },
   },
