@@ -106,6 +106,10 @@ passwordRecoveryController.newPassword = async (req, res) => {
     //1- Extraer el token de las cookies
     const token = req.cookies.tokenRecoveryCode;
 
+    if (!token) {
+      return res.json({ message: "Not token provided" });
+    }
+
     //2- Desglozar lo que tiene el token adentro
     const decoded = jsonwebtoken.verify(token, config.JWT.secret);
 

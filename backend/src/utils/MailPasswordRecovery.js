@@ -29,7 +29,7 @@ const sendMail = async (to, subject, text, html) => {
     });
     return info;
   } catch (error) {
-    console.log("Error sending recovery email");
+    console.log("Error sending recovery email" + console.error);
   }
 };
 
