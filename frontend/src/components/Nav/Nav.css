@@ -1,0 +1,29 @@
+.navbary {
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #2e509f !important;
+    border-color: #2e509f !important;
+    z-index: 99999 !important;
+}
+
+.itemnav {
+    color: #ffffff !important;
+    padding-left: 10px;
+}
+
+/* Agregar una línea roja debajo del enlace activo */
+.nav-link.active {
+    border-bottom: 2px solid #5e8af0; /* Línea roja debajo del enlace activo */
+}
+
+/* Estilos del navbar-toggler */
+.navbar-toggler {
+    border-color: white; /* Cambia el color del borde del botón */
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='white' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    /* Cambia el icono del toggler a blanco */
+}

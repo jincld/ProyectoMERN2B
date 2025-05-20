@@ -1,17 +1,17 @@
 import express from "express";
 import employeeController from "../controllers/employeeControllers.js";
-// Router() nos ayuda a colocar los metodos
-// que tendra mi ruta
+
 const router = express.Router();
 
+// La ruta completa ahora es '/api/employees'
 router
-  .route("/")
-  .get(employeeController.getemployee)
-  .post(employeeController.createemployee);
+  .route("/employees")
+  .get(employeeController.getemployee)  // Obtener empleados
+  .post(employeeController.createemployee);  // Crear empleado
 
 router
-  .route("/:id")
-  .put(employeeController.updateemployee)
-  .delete(employeeController.deleteemployee);
+  .route("/employees/:id")
+  .put(employeeController.updateemployee)  // Actualizar empleado
+  .delete(employeeController.deleteemployee);  // Eliminar empleado
 
 export default router;
