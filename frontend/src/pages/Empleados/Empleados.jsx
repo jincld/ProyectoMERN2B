@@ -90,19 +90,20 @@ const Empleados = () => {
         });
   
       } else {
-        // Crear nuevo empleado (POST)
-        res = await fetch('http://localhost:4000/api/employees', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        alert(data.message || 'Empleado registrado exitosamente');
-        
-        // Agregar el nuevo empleado a la lista
-        setEmpleados([...empleados, payload]);
+// Crear nuevo empleado (POST)
+res = await fetch('http://localhost:4000/api/employees', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(payload),
+});
+const newEmp = await res.json();
+alert('Empleado registrado exitosamente');
+
+// Agrega al estado el empleado real con _id
+setEmpleados([...empleados, newEmp]);
+
       }
   
       // Limpiar formulario
@@ -131,22 +132,27 @@ const Empleados = () => {
 
 
   // Editar empleado
-  const handleEdit = (index) => {
-    const emp = empleados[index];
-    setFormData({
-      name: emp.name,
-      lastName: emp.lastName,
-      birthday: emp.birthday,
-      email: emp.email,
-      address: emp.address,
-      password: emp.password,
-      hireDate: emp.hireDate,
-      telephone: emp.telephone,
-      dui: emp.dui,
-      issnumber: emp.issnumber
-    });
-    setEditIndex(index); // Establecer el índice de edición
-  };
+const formatDate = (isoString) => {
+  return isoString ? isoString.split('T')[0] : '';
+};
+
+const handleEdit = (index) => {
+  const emp = empleados[index];
+  setFormData({
+    name: emp.name,
+    lastName: emp.lastName,
+    birthday: formatDate(emp.birthday),
+    email: emp.email,
+    address: emp.address,
+    password: emp.password, // No es seguro reutilizar contraseñas
+    hireDate: formatDate(emp.hireDate),
+    telephone: emp.telephone,
+    dui: emp.dui,
+    issnumber: emp.issnumber
+  });
+  setEditIndex(index);
+};
+
   
 
   // Eliminar empleado
@@ -198,7 +204,7 @@ const Empleados = () => {
         ))}
 
         <div className="col-12 d-flex gap-2">
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-azul">
             {editIndex !== null ? 'Actualizar Empleado' : 'Guardar Empleado'}
           </button>
           {editIndex !== null && (

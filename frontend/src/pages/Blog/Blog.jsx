@@ -155,7 +155,7 @@ const Blogs = () => {
         </div>
 
         <div className="col-12 d-flex gap-2">
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-azul">
             {editIndex !== null ? 'Actualizar Blog' : 'Guardar Blog'}
           </button>
           {editIndex !== null && (

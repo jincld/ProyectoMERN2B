@@ -15,7 +15,7 @@
 
 /* Agregar una línea roja debajo del enlace activo */
 .nav-link.active {
-    border-bottom: 2px solid #5e8af0; /* Línea roja debajo del enlace activo */
+    border-bottom: 2px solid #82a3f0; /* Línea roja debajo del enlace activo */
 }
 
 /* Estilos del navbar-toggler */

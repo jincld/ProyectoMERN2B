@@ -1,4 +1,6 @@
 import employeeModel from "../models/employee.js";
+import bcryptjs from "bcryptjs";
+
 const employeeController = {};
 
 // GET - Traer todos los empleados
@@ -13,21 +15,25 @@ employeeController.getemployee = async (req, res) => {
 
 // POST - Crear un nuevo empleado
 employeeController.createemployee = async (req, res) => {
-  const { name, lastName, birthday, email, password, telephone, dui, issnumber, hireDate } = req.body;
+  const { name, lastName, birthday, email, password, telephone, dui, issnumber, hireDate, address } = req.body;
   try {
+    const passwordHash = await bcryptjs.hash(password, 10); // 🔐 Encriptar contraseña
+
     const newEmployee = new employeeModel({
       name,
       lastName,
       birthday,
       email,
-      password,
+      password: passwordHash,
       telephone,
       dui,
       issnumber,
-      hireDate
+      hireDate,
+      address
     });
+
     await newEmployee.save();
-    res.json({ message: 'Empleado guardado exitosamente' });
+    res.json(newEmployee);
   } catch (error) {
     res.status(500).json({ message: 'Error al crear empleado' });
   }
@@ -48,26 +54,39 @@ employeeController.deleteemployee = async (req, res) => {
 
 // PUT - Actualizar un empleado
 employeeController.updateemployee = async (req, res) => {
-  const { name, lastName, birthday, email, password, telephone, dui, issnumber, hireDate } = req.body;
+  let { name, lastName, birthday, email, password, telephone, dui, issnumber, hireDate, address } = req.body;
   try {
+    // 🔐 Encriptar si se actualiza la contraseña
+    if (password) {
+      password = await bcryptjs.hash(password, 10);
+    }
+
+    const updatedData = {
+      name,
+      lastName,
+      birthday,
+      email,
+      telephone,
+      dui,
+      issnumber,
+      hireDate,
+      address
+    };
+
+    if (password) {
+      updatedData.password = password;
+    }
+
     const updatedEmployee = await employeeModel.findByIdAndUpdate(
       req.params.id,
-      {
-        name,
-        lastName,
-        birthday,
-        email,
-        password,
-        telephone,
-        dui,
-        issnumber,
-        hireDate
-      },
+      updatedData,
       { new: true }
     );
+
     if (!updatedEmployee) {
       return res.status(404).json({ message: 'Empleado no encontrado' });
     }
+
     res.json({ message: 'Empleado actualizado exitosamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al actualizar el empleado' });

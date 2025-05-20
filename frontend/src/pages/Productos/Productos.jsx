@@ -158,7 +158,7 @@ const Productos = () => {
 
   return (
     <div className="container my-4">
-      <h2 className="mb-4 margin-top-emp">{editIndex !== null ? 'Editar producto' : 'Registro de productos'}</h2>
+      <h2 className="mb-4 margin-top-prod">{editIndex !== null ? 'Editar producto' : 'Registro de productos'}</h2>
 
       <form onSubmit={handleSubmit} className="row g-3">
         {[ 
@@ -181,7 +181,7 @@ const Productos = () => {
         ))}
 
         <div className="col-12 d-flex gap-2">
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-azul">
             {editIndex !== null ? 'Actualizar producto' : 'Guardar producto'}
           </button>
           {editIndex !== null && (
