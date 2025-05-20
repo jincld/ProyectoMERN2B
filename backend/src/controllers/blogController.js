@@ -27,10 +27,12 @@ blogController.createBlog = async (req, res) => {
 
     if (req.file) {
       //Subir el archivo a Cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path, {
+      const result = await cloudinary.uploader.upload(
+        req.file.path, 
+        {
         folder: "public",
         allowed_formats: ["jpg", "png", "jpeg"],
-      });
+        });
       imageUrl = result.secure_url;
     }
 
@@ -38,6 +40,33 @@ blogController.createBlog = async (req, res) => {
     newBlog.save();
 
     res.json({ message: "Blog saved" });
+  } catch (error) {
+    console.log("error" + error);
+  }
+};
+
+blogController.updateBlog = async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    let imageUrl = "";
+
+    if (req.file) {
+      //Subir el archivo a Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, 
+        {
+        folder: "public",
+        allowed_formats: ["jpg", "png", "jpeg"],
+        });
+      imageUrl = result.secure_url;
+    }
+
+    await blogModel.findByIdAndUpdate(req.params.id,
+       {
+        title, content, image: imageUrl
+       }, {new: true}
+      )
+
+    res.json({ message: "Blog updated" });
   } catch (error) {
     console.log("error" + error);
   }

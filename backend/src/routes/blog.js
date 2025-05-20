@@ -10,6 +10,7 @@ const upload = multer({dest: "public/"})
 router
   .route("/")
   .get(blogController.getAllBlog)
+  
   .post(upload.single("image"), blogController.createBlog);
 
 export default router;
