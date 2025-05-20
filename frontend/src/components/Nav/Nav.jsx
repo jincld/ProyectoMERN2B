@@ -17,7 +17,7 @@ function Nav() {
               <ul className="navbar-nav">
                 <li className="nav-item">
                   {/* Usamos NavLink para poder resaltar el enlace activo */}
-                  <NavLink className="nav-link itemnav" to="/" activeClassName="active">Productos</NavLink>
+                  <NavLink className="nav-link itemnav" to="/productos" activeClassName="active">Productos</NavLink>
                 </li>
                 <li className="nav-item">
                   <NavLink className="nav-link itemnav" to="/empleados" activeClassName="active">Empleados</NavLink>

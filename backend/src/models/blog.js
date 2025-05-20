@@ -1,12 +1,3 @@
-/*
-    Colección: Blog
-
-    Campos:
-        title
-        content
-        image
-*/
-
 import { Schema, model } from "mongoose";
 
 const blogSchema = new Schema(

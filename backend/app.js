@@ -29,7 +29,7 @@ app.use(express.json());
 //Que acepte cookies en postman
 app.use(cookieParser());
 // Definir las rutas de las funciones que tendrá la página web
-app.use("/api/products", productsRoutes);
+app.use("/api", productsRoutes);
 app.use("/api/customers", customersRoutes);
 app.use("/api", employeeRoutes);
 app.use("/api/branches", branchesRoutes);

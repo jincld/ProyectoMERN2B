@@ -2,18 +2,23 @@
 const productsController = {};
 import productsModel from "../models/Products.js";
 
-// SELECT
 productsController.getProducts = async (req, res) => {
-  const products = await productsModel.find();
-  res.json(products);
+  try {
+    const products = await productsModel.find();
+    res.json(products);
+  } catch (error) {
+    console.error('Error al obtener productos:', error);
+    res.status(500).json({ message: 'Error al obtener los productos' });
+  }
 };
+
 
 // INSERT
 productsController.createProducts = async (req, res) => {
   const { name, description, price, stock } = req.body;
   const newProduct = new productsModel({ name, description, price, stock });
   await newProduct.save();
-  res.json({ message: "product saved" });
+  res.json({ message: "Producto guardado" });
 };
 
 // DELETE
@@ -22,8 +27,9 @@ productsController.deleteProducts = async (req, res) => {
   if (!deletedProduct) {
     return res.status(404).json({ message: "Producto no encontrado" });
   }
-  res.json({ message: "product deleted" });
+  res.json({ message: "Producto eliminado exitosamente" });
 };
+
 
 // UPDATE
 productsController.updateProducts = async (req, res) => {
@@ -41,7 +47,7 @@ productsController.updateProducts = async (req, res) => {
     { new: true }
   );
   // muestro un mensaje que todo se actualizo
-  res.json({ message: "product updated" });
+  res.json({ message: "Producto actualizado" });
 };
 
 export default productsController;
