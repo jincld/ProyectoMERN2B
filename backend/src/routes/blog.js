@@ -8,7 +8,7 @@ const router = express.Router();
 const upload = multer({dest: "public/"})
 
 router
-  .route("/")
+  .route("/blogs")
   .get(blogController.getAllBlog)
   
   .post(upload.single("image"), blogController.createBlog);

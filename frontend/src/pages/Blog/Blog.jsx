@@ -1,181 +1,171 @@
 import React, { useState, useEffect } from 'react';
 
-const Productos = () => {
-  const [productos, setProductos] = useState([]);
+const Blogs = () => {
+  const [blogs, setBlogs] = useState([]);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    stock: ''
+    title: '',
+    content: '',
+    image: null
   });
   const [editIndex, setEditIndex] = useState(null); // Controla si estamos editando
 
-  // Cargar los productos desde el backend
+  // Cargar los blogs desde el backend
   useEffect(() => {
-    const fetchProductos = async () => {
+    const fetchBlogs = async () => {
       try {
-        const res = await fetch('http://localhost:4000/api/products');
+        const res = await fetch('http://localhost:4000/api/blogs');
         const data = await res.json();
-        setProductos(data);
+        setBlogs(data);
       } catch (error) {
-        console.error('Error al cargar los productos:', error);
+        console.error('Error al cargar los blogs:', error);
       }
     };
 
-    fetchProductos();
+    fetchBlogs();
   }, []);
 
   // Manejo de cambios en los campos del formulario
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === 'image') {
+      setFormData({ ...formData, image: e.target.files[0] });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
   // Enviar los datos del formulario (POST o PUT)
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // Validación de los campos
-  if (!formData.name || !formData.description || !formData.price || !formData.stock) {
-    alert("Por favor, completa todos los campos.");
-    return;
-  }
-
-  // Validar que el precio y el stock sean números y positivos
-  if (isNaN(formData.price) || formData.price <= 0) {
-    alert("El precio debe ser un número mayor a 0.");
-    return;
-  }
-
-  if (isNaN(formData.stock) || formData.stock < 0) {
-    alert("El stock debe ser un número mayor o igual a 0.");
-    return;
-  }
-
-  const payload = {
-    name: formData.name,
-    description: formData.description,
-    price: parseFloat(formData.price),  // Convertir a número
-    stock: parseInt(formData.stock),    // Convertir a número entero
-  };
-
-  try {
-    let res;
-    if (editIndex !== null) {
-      // Asegurarse de que editIndex es válido
-      const productToEdit = productos[editIndex];
-      if (!productToEdit || !productToEdit._id) {
-        throw new Error("El ID del producto no es válido");
-      }
-
-      const id = productToEdit._id; // Obtener el _id del producto correctamente
-
-      // Actualizar producto (PUT)
-      res = await fetch(`http://localhost:4000/api/products/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const updatedData = await res.json();
-      alert(updatedData.message || 'Producto actualizado exitosamente');
-
-      // Actualizar el producto en el estado
-      setProductos((prevState) => {
-        const updatedProductos = [...prevState];
-        updatedProductos[editIndex] = { ...updatedProductos[editIndex], ...payload };
-        return updatedProductos;
-      });
-    } else {
-      // Crear nuevo producto (POST)
-      res = await fetch('http://localhost:4000/api/products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      alert(data.message || 'Producto registrado exitosamente');
-      setProductos([...productos, payload]);
+    // Validación de los campos
+    if (!formData.title || !formData.content) {
+      alert("Por favor, completa todos los campos.");
+      return;
     }
 
-    // Limpiar formulario
+    // Crear un FormData para manejar la subida de imágenes
+    const payload = new FormData();
+    payload.append('title', formData.title);
+    payload.append('content', formData.content);
+    if (formData.image) {
+      payload.append('image', formData.image);
+    }
+
+    try {
+      let res;
+      if (editIndex !== null) {
+        // Asegurarse de que editIndex es válido
+        const blogToEdit = blogs[editIndex];
+        if (!blogToEdit || !blogToEdit._id) {
+          throw new Error("El ID del blog no es válido");
+        }
+
+        const id = blogToEdit._id; // Obtener el _id del blog correctamente
+
+        // Actualizar blog (PUT)
+        res = await fetch(`http://localhost:4000/api/blogs/${id}`, {
+          method: 'PUT',
+          body: payload,
+        });
+
+        const updatedData = await res.json();
+        alert(updatedData.message || 'Blog actualizado exitosamente');
+
+        // Actualizar el blog en el estado
+        setBlogs((prevState) => {
+          const updatedBlogs = [...prevState];
+          updatedBlogs[editIndex] = { ...updatedBlogs[editIndex], ...formData };
+          return updatedBlogs;
+        });
+      } else {
+        // Crear nuevo blog (POST)
+        res = await fetch('http://localhost:4000/api/blogs', {
+          method: 'POST',
+          body: payload,
+        });
+
+        const data = await res.json();
+        alert(data.message || 'Blog registrado exitosamente');
+        setBlogs([...blogs, { title: formData.title, content: formData.content }]);
+      }
+
+      // Limpiar formulario
+      setFormData({
+        title: '',
+        content: '',
+        image: null
+      });
+      setEditIndex(null);
+    } catch (error) {
+      console.error('Error al guardar el blog:', error);
+      alert('Ocurrió un error al guardar el blog.');
+    }
+  };
+
+  // Editar blog
+  const handleEdit = (index) => {
+    const blog = blogs[index];
     setFormData({
-      name: '',
-      description: '',
-      price: '',
-      stock: '',
+      title: blog.title,
+      content: blog.content,
+      image: null // No cargamos la imagen al editar
     });
-    setEditIndex(null);
-  } catch (error) {
-    console.error('Error al guardar producto:', error);
-    alert('Ocurrió un error al guardar el producto.');
-  }
-};
+    setEditIndex(index); // Establecer el índice de edición
+  };
 
-
-
-
-  // Editar producto
-const handleEdit = (index) => {
-  const prod = productos[index];
-  setFormData({
-    name: prod.name,
-    description: prod.description,
-    price: prod.price,
-    stock: prod.stock
-  });
-  setEditIndex(index); // Establecer el índice de edición
-};
-
-  // Eliminar producto
+  // Eliminar blog
   const handleDelete = async (index) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-      const id = productos[index]._id;
+    if (window.confirm('¿Estás seguro de que deseas eliminar este blog?')) {
+      const id = blogs[index]._id;
       try {
-        const res = await fetch(`http://localhost:4000/api/products/${id}`, {
+        const res = await fetch(`http://localhost:4000/api/blogs/${id}`, {
           method: 'DELETE',
         });
         const data = await res.json();
-        alert(data.message || 'Producto eliminado exitosamente');
-        setProductos(productos.filter((_, i) => i !== index));
+        alert(data.message || 'Blog eliminado exitosamente');
+        setBlogs(blogs.filter((_, i) => i !== index));
       } catch (error) {
-        console.error('Error al eliminar productos:', error);
-        alert('Ocurrió un error al eliminar el producto.');
+        console.error('Error al eliminar el blog:', error);
+        alert('Ocurrió un error al eliminar el blog.');
       }
     }
   };
 
   return (
     <div className="container my-4">
-      <h2 className="mb-4 margin-top-emp">{editIndex !== null ? 'Editar producto' : 'Registro de productos'}</h2>
+      <h2 className="mb-4">{editIndex !== null ? 'Editar Blog' : 'Registrar Blog'}</h2>
 
       <form onSubmit={handleSubmit} className="row g-3">
-        {[ 
-          { label: 'Nombre', name: 'name' },
-          { label: 'Descripción', name: 'description' },
-          { label: 'Precio', name: 'price' },
-          { label: 'Stock', name: 'stock' },
+        {[
+          { label: 'Título', name: 'title' },
+          { label: 'Contenido', name: 'content' },
         ].map((field, idx) => (
           <div className="col-md-6" key={idx}>
             <label className="form-label">{field.label}</label>
             <input
-              type={field.type || 'text'}
+              type={field.name === 'content' ? 'textarea' : 'text'}
               className="form-control"
               name={field.name}
-              value={formData[field.name]} 
+              value={formData[field.name]}
               onChange={handleChange}
               required
             />
           </div>
         ))}
+        
+        <div className="col-md-6">
+          <label className="form-label">Imagen</label>
+          <input
+            type="file"
+            className="form-control"
+            name="image"
+            onChange={handleChange}
+          />
+        </div>
 
         <div className="col-12 d-flex gap-2">
           <button type="submit" className="btn btn-primary">
-            {editIndex !== null ? 'Actualizar producto' : 'Guardar producto'}
+            {editIndex !== null ? 'Actualizar Blog' : 'Guardar Blog'}
           </button>
           {editIndex !== null && (
             <button
@@ -183,10 +173,9 @@ const handleEdit = (index) => {
               className="btn btn-secondary"
               onClick={() => {
                 setFormData({
-                    name: '',
-                    description: '',
-                    price: '',
-                    stock: ''
+                  title: '',
+                  content: '',
+                  image: null
                 });
                 setEditIndex(null);
               }}
@@ -199,27 +188,28 @@ const handleEdit = (index) => {
 
       <hr className="my-5" />
 
-      <h3>Lista de productos</h3>
-      {productos.length === 0 ? (
-        <p>No hay productos registrados.</p>
+      <h3>Lista de Blogs</h3>
+      {blogs.length === 0 ? (
+        <p>No hay blogs registrados.</p>
       ) : (
         <div className="table-responsive">
           <table className="table table-bordered table-striped mt-3">
             <thead>
               <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Precio</th>
-                <th>Stock</th>
+                <th>Título</th>
+                <th>Contenido</th>
+                <th>Imagen</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {productos.map((prod, index) => (
+              {blogs.map((blog, index) => (
                 <tr key={index}>
-                  <td>{prod.name}</td>
-                  <td>{prod.description}</td>
-                  <td>{prod.price}</td>
-                  <td>{prod.stock}</td>
+                  <td>{blog.title}</td>
+                  <td>{blog.content}</td>
+                  <td>
+                    {blog.image && <img src={blog.image} alt="Blog" width="100" />}
+                  </td>
                   <td>
                     <button
                       className="btn btn-sm btn-warning me-2"
@@ -244,4 +234,4 @@ const handleEdit = (index) => {
   );
 };
 
-export default Productos;
+export default Blogs;
