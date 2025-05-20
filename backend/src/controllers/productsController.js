@@ -14,12 +14,14 @@ productsController.getProducts = async (req, res) => {
 
 
 // INSERT
+// INSERT
 productsController.createProducts = async (req, res) => {
   const { name, description, price, stock } = req.body;
   const newProduct = new productsModel({ name, description, price, stock });
-  await newProduct.save();
-  res.json({ message: "Producto guardado" });
+  const savedProduct = await newProduct.save();  // Guarda y obtiene el producto creado
+  res.json({ message: "Producto guardado", product: savedProduct });  // Devuelve el producto creado
 };
+
 
 // DELETE
 productsController.deleteProducts = async (req, res) => {

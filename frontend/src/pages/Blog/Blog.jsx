@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './Blog.css';
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -7,24 +8,24 @@ const Blogs = () => {
     content: '',
     image: null
   });
-  const [editIndex, setEditIndex] = useState(null); // Controla si estamos editando
+  const [editIndex, setEditIndex] = useState(null);
 
-  // Cargar los blogs desde el backend
+  // Cargar blogs desde el backend
+  const fetchBlogs = async () => {
+    try {
+      const res = await fetch('http://localhost:4000/api/blogs');
+      const data = await res.json();
+      setBlogs(data);
+    } catch (error) {
+      console.error('Error al cargar los blogs:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const res = await fetch('http://localhost:4000/api/blogs');
-        const data = await res.json();
-        setBlogs(data);
-      } catch (error) {
-        console.error('Error al cargar los blogs:', error);
-      }
-    };
-
     fetchBlogs();
   }, []);
 
-  // Manejo de cambios en los campos del formulario
+  // Manejar cambios en el formulario
   const handleChange = (e) => {
     if (e.target.name === 'image') {
       setFormData({ ...formData, image: e.target.files[0] });
@@ -33,17 +34,15 @@ const Blogs = () => {
     }
   };
 
-  // Enviar los datos del formulario (POST o PUT)
+  // Enviar formulario (crear o actualizar)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación de los campos
     if (!formData.title || !formData.content) {
-      alert("Por favor, completa todos los campos.");
+      alert('Por favor, completa todos los campos.');
       return;
     }
 
-    // Crear un FormData para manejar la subida de imágenes
     const payload = new FormData();
     payload.append('title', formData.title);
     payload.append('content', formData.content);
@@ -52,78 +51,61 @@ const Blogs = () => {
     }
 
     try {
-      let res;
       if (editIndex !== null) {
-        // Asegurarse de que editIndex es válido
         const blogToEdit = blogs[editIndex];
-        if (!blogToEdit || !blogToEdit._id) {
-          throw new Error("El ID del blog no es válido");
-        }
+        const id = blogToEdit._id;
 
-        const id = blogToEdit._id; // Obtener el _id del blog correctamente
-
-        // Actualizar blog (PUT)
-        res = await fetch(`http://localhost:4000/api/blogs/${id}`, {
+        const res = await fetch(`http://localhost:4000/api/blogs/${id}`, {
           method: 'PUT',
-          body: payload,
+          body: payload
         });
 
-        const updatedData = await res.json();
-        alert(updatedData.message || 'Blog actualizado exitosamente');
+        const data = await res.json();
+        alert(data.message || 'Blog actualizado exitosamente');
 
-        // Actualizar el blog en el estado
-        setBlogs((prevState) => {
-          const updatedBlogs = [...prevState];
-          updatedBlogs[editIndex] = { ...updatedBlogs[editIndex], ...formData };
-          return updatedBlogs;
-        });
       } else {
-        // Crear nuevo blog (POST)
-        res = await fetch('http://localhost:4000/api/blogs', {
+        const res = await fetch('http://localhost:4000/api/blogs', {
           method: 'POST',
-          body: payload,
+          body: payload
         });
 
         const data = await res.json();
         alert(data.message || 'Blog registrado exitosamente');
-        setBlogs([...blogs, { title: formData.title, content: formData.content }]);
       }
 
-      // Limpiar formulario
-      setFormData({
-        title: '',
-        content: '',
-        image: null
-      });
+      // Limpiar formulario y recargar blogs
+      setFormData({ title: '', content: '', image: null });
       setEditIndex(null);
+      fetchBlogs();
+
     } catch (error) {
       console.error('Error al guardar el blog:', error);
       alert('Ocurrió un error al guardar el blog.');
     }
   };
 
-  // Editar blog
+  // Editar
   const handleEdit = (index) => {
     const blog = blogs[index];
     setFormData({
       title: blog.title,
       content: blog.content,
-      image: null // No cargamos la imagen al editar
+      image: null
     });
-    setEditIndex(index); // Establecer el índice de edición
+    setEditIndex(index);
   };
 
-  // Eliminar blog
+  // Eliminar
   const handleDelete = async (index) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este blog?')) {
       const id = blogs[index]._id;
       try {
         const res = await fetch(`http://localhost:4000/api/blogs/${id}`, {
-          method: 'DELETE',
+          method: 'DELETE'
         });
         const data = await res.json();
         alert(data.message || 'Blog eliminado exitosamente');
-        setBlogs(blogs.filter((_, i) => i !== index));
+        fetchBlogs();
       } catch (error) {
         console.error('Error al eliminar el blog:', error);
         alert('Ocurrió un error al eliminar el blog.');
@@ -133,26 +115,35 @@ const Blogs = () => {
 
   return (
     <div className="container my-4">
-      <h2 className="mb-4">{editIndex !== null ? 'Editar Blog' : 'Registrar Blog'}</h2>
+      <h2 className="mb-4 margin-top-emp">{editIndex !== null ? 'Editar Blog' : 'Registrar Blog'}</h2>
 
-      <form onSubmit={handleSubmit} className="row g-3">
-        {[
-          { label: 'Título', name: 'title' },
-          { label: 'Contenido', name: 'content' },
-        ].map((field, idx) => (
-          <div className="col-md-6" key={idx}>
-            <label className="form-label">{field.label}</label>
-            <input
-              type={field.name === 'content' ? 'textarea' : 'text'}
-              className="form-control"
-              name={field.name}
-              value={formData[field.name]}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        ))}
-        
+      <div className="centered-form">
+
+      <form onSubmit={handleSubmit} className="row g-3 w-75">
+        <div className="col-md-6">
+          <label className="form-label">Título</label>
+          <input
+            type="text"
+            className="form-control"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="col-md-6">
+          <label className="form-label">Contenido</label>
+          <input
+            type="text"
+            className="form-control"
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
         <div className="col-md-6">
           <label className="form-label">Imagen</label>
           <input
@@ -172,11 +163,7 @@ const Blogs = () => {
               type="button"
               className="btn btn-secondary"
               onClick={() => {
-                setFormData({
-                  title: '',
-                  content: '',
-                  image: null
-                });
+                setFormData({ title: '', content: '', image: null });
                 setEditIndex(null);
               }}
             >
@@ -185,6 +172,7 @@ const Blogs = () => {
           )}
         </div>
       </form>
+      </div>
 
       <hr className="my-5" />
 
@@ -208,7 +196,13 @@ const Blogs = () => {
                   <td>{blog.title}</td>
                   <td>{blog.content}</td>
                   <td>
-                    {blog.image && <img src={blog.image} alt="Blog" width="100" />}
+                    {blog.image && (
+                      <img
+                        src={blog.image}
+                        alt="Blog"
+                        style={{ width: '100px', objectFit: 'cover' }}
+                      />
+                    )}
                   </td>
                   <td>
                     <button

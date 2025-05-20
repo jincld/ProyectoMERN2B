@@ -39,37 +39,58 @@ blogController.createBlog = async (req, res) => {
     const newBlog = new blogModel({ title, content, image: imageUrl });
     newBlog.save();
 
-    res.json({ message: "Blog saved" });
+    res.json({ message: "Blog guardado" });
   } catch (error) {
     console.log("error" + error);
   }
 };
 
+// Actualizar
 blogController.updateBlog = async (req, res) => {
   try {
     const { title, content } = req.body;
-    let imageUrl = "";
+
+    // Obtener blog actual
+    const existingBlog = await blogModel.findById(req.params.id);
+    if (!existingBlog) return res.status(404).json({ message: "Blog no encontrado" });
+
+    let imageUrl = existingBlog.image; // mantener la imagen anterior
 
     if (req.file) {
-      //Subir el archivo a Cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path, 
-        {
+      // Subir nueva imagen
+      const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "public",
         allowed_formats: ["jpg", "png", "jpeg"],
-        });
+      });
       imageUrl = result.secure_url;
     }
 
-    await blogModel.findByIdAndUpdate(req.params.id,
-       {
-        title, content, image: imageUrl
-       }, {new: true}
-      )
+    await blogModel.findByIdAndUpdate(req.params.id, {
+      title,
+      content,
+      image: imageUrl,
+    });
 
-    res.json({ message: "Blog updated" });
+    res.json({ message: "Blog actualizado correctamente" });
   } catch (error) {
-    console.log("error" + error);
+    console.error("Error al actualizar:", error);
+    res.status(500).json({ message: "Error al actualizar el blog" });
   }
 };
+
+// Eliminar
+blogController.deleteBlog = async (req, res) => {
+  try {
+    const blog = await blogModel.findByIdAndDelete(req.params.id);
+    if (!blog) {
+      return res.status(404).json({ message: "Blog no encontrado" });
+    }
+    res.json({ message: "Blog eliminado correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar:", error);
+    res.status(500).json({ message: "Error al eliminar el blog" });
+  }
+};
+
 
 export default blogController;

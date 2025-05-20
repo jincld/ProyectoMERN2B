@@ -10,7 +10,11 @@ const upload = multer({dest: "public/"})
 router
   .route("/blogs")
   .get(blogController.getAllBlog)
-  
   .post(upload.single("image"), blogController.createBlog);
+
+  router
+  .route("/blogs/:id")
+  .put(upload.single("image"), blogController.updateBlog)
+  .delete(blogController.deleteBlog);
 
 export default router;

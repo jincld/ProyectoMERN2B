@@ -38,115 +38,96 @@ const Empleados = () => {
   };
 
   // Enviar los datos del formulario (POST o PUT)
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  // Validación de los campos
-  if (!formData.name || !formData.lastName || !formData.birthday || !formData.email || !formData.address || !formData.password || !formData.telephone || !formData.dui || !formData.issnumber) {
-    alert("Por favor, completa todos los campos.");
-    return;
-  }
-
-  // Validar que el cumpleaños sea una fecha válida
-  const birthdayDate = new Date(formData.birthday);
-  if (isNaN(birthdayDate.getTime())) {
-    alert("La fecha de cumpleaños no es válida.");
-    return;
-  }
-
-  // Validar el formato del email
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (!emailRegex.test(formData.email)) {
-    alert("El correo electrónico no es válido.");
-    return;
-  }
-
-  // Validar que el teléfono sea un número y tenga el formato esperado
-  const telephoneRegex = /^[0-9]{8}$/; // Asumiendo que el teléfono tiene 8 dígitos
-  if (!telephoneRegex.test(formData.telephone)) {
-    alert("El número de teléfono debe tener 8 dígitos.");
-    return;
-  }
-
-  // Validar el formato del DUI
-  const duiRegex = /^[0-9]{8}-[0-9]{1}$/; // Asumiendo que el formato del DUI es 8 dígitos y un guión seguido de 1 dígito
-  if (!duiRegex.test(formData.dui)) {
-    alert("El formato del DUI no es válido.");
-    return;
-  }
-
-  // Validar que el ISSN sea un número de 9 dígitos
-  const issnumberRegex = /^[0-9]{9}$/;
-  if (!issnumberRegex.test(formData.issnumber)) {
-    alert("El número ISSS debe tener 9 dígitos.");
-    return;
-  }
-
-  const payload = {
-    name: formData.name,
-    lastName: formData.lastName,
-    birthday: formData.birthday,
-    email: formData.email,
-    address: formData.address,
-    password: formData.password,
-    hireDate: formData.hireDate,
-    telephone: formData.telephone,
-    dui: formData.dui,
-    issnumber: formData.issnumber,
-  };
-
-  try {
-    let res;
-    if (editIndex !== null) {
-      // Actualizar empleado (PUT)
-      const id = empleados[editIndex]._id;
-      res = await fetch(`http://localhost:4000/api/employees/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      const updatedData = await res.json();
-      alert(updatedData.message || 'Empleado actualizado exitosamente');
-      setEmpleados((prevState) => {
-        const updatedEmpleados = [...prevState];
-        updatedEmpleados[editIndex] = { ...updatedEmpleados[editIndex], ...payload };
-        return updatedEmpleados;
-      });
-    } else {
-      // Crear nuevo empleado (POST)
-      res = await fetch('http://localhost:4000/api/employees', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      alert(data.message || 'Empleado registrado exitosamente');
-      setEmpleados([...empleados, payload]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Validación de los campos (simplificado para el ejemplo)
+    if (!formData.name || !formData.lastName || !formData.email) {
+      alert("Por favor, completa todos los campos.");
+      return;
     }
-
-    // Limpiar formulario
-    setFormData({
-      name: '',
-      lastName: '',
-      birthday: '',
-      email: '',
-      address: '',
-      password: '',
-      hireDate: '',
-      telephone: '',
-      dui: '',
-      issnumber: '',
-    });
-    setEditIndex(null);
-  } catch (error) {
-    console.error('Error al guardar empleado:', error);
-    alert('Ocurrió un error al guardar el empleado.');
-  }
-};
+  
+    const payload = {
+      name: formData.name,
+      lastName: formData.lastName,
+      birthday: formData.birthday,
+      email: formData.email,
+      address: formData.address,
+      password: formData.password,
+      hireDate: formData.hireDate,
+      telephone: formData.telephone,
+      dui: formData.dui,
+      issnumber: formData.issnumber,
+    };
+  
+    try {
+      let res;
+      if (editIndex !== null) {
+        // Verifica si el ID del empleado existe
+        const id = empleados[editIndex]._id;
+        if (!id) {
+          alert('ID de empleado no válido');
+          return;
+        }
+  
+        // Actualizar empleado (PUT)
+        res = await fetch(`http://localhost:4000/api/employees/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        const updatedData = await res.json();
+        alert(updatedData.message || 'Empleado actualizado exitosamente');
+        
+        // Actualizar el estado con los nuevos datos del empleado
+        setEmpleados((prevState) => {
+          const updatedEmpleados = [...prevState];
+          updatedEmpleados[editIndex] = { ...updatedEmpleados[editIndex], ...payload };
+          return updatedEmpleados;
+        });
+  
+      } else {
+        // Crear nuevo empleado (POST)
+        res = await fetch('http://localhost:4000/api/employees', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        alert(data.message || 'Empleado registrado exitosamente');
+        
+        // Agregar el nuevo empleado a la lista
+        setEmpleados([...empleados, payload]);
+      }
+  
+      // Limpiar formulario
+      setFormData({
+        name: '',
+        lastName: '',
+        birthday: '',
+        email: '',
+        address: '',
+        password: '',
+        hireDate: '',
+        telephone: '',
+        dui: '',
+        issnumber: ''
+      });
+  
+      // Resetear la edición
+      setEditIndex(null);
+  
+    } catch (error) {
+      console.error('Error al guardar empleado:', error);
+      alert('Ocurrió un error al guardar el empleado.');
+    }
+  };
+  
 
 
   // Editar empleado
@@ -164,8 +145,9 @@ const handleSubmit = async (e) => {
       dui: emp.dui,
       issnumber: emp.issnumber
     });
-    setEditIndex(index);
+    setEditIndex(index); // Establecer el índice de edición
   };
+  
 
   // Eliminar empleado
   const handleDelete = async (index) => {
